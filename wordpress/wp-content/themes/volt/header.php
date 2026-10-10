@@ -1,0 +1,5 @@
+<!doctype html><html <?php language_attributes(); ?>><head><meta charset="<?php bloginfo('charset'); ?>"><meta name="viewport" content="width=device-width, initial-scale=1"><?php wp_head(); ?></head><body <?php body_class(); ?>><?php wp_body_open(); ?>
+<a class="screen-reader-text" href="#main">Перейти к содержимому</a>
+<header class="site-header"><div class="wrap header-inner"><a class="brand" href="<?php echo esc_url(home_url('/')); ?>">VOLT<span>®</span></a><nav aria-label="Главное меню">
+<?php if (has_nav_menu('primary')) { wp_nav_menu(['theme_location'=>'primary','container'=>false,'items_wrap'=>'%3$s','walker'=>new class extends Walker_Nav_Menu { public function start_el(&$output, $item, $depth=0, $args=null, $id=0) { $output .= '<a href="'.esc_url($item->url).'">'.esc_html($item->title).'</a>'; } public function end_el(&$output,$item,$depth=0,$args=null) {} }]); } ?>
+</nav><a class="cart-link" href="<?php echo esc_url(function_exists('wc_get_cart_url') ? wc_get_cart_url() : home_url('/')); ?>">Корзина · <?php echo function_exists('WC') && WC()->cart ? (int)WC()->cart->get_cart_contents_count() : 0; ?></a></div></header>

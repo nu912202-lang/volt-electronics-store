@@ -1,0 +1,1 @@
+<?php get_header(); ?><main id="main" class="wrap page-main content"><?php while(have_posts()):the_post(); ?><div class="eyebrow"><?php echo esc_html(get_the_date()); ?></div><h1><?php the_title(); ?></h1><?php the_content(); ?><p><a href="<?php echo esc_url(home_url('/news/')); ?>">← Все новости</a></p><?php endwhile; ?></main><?php get_footer(); ?>

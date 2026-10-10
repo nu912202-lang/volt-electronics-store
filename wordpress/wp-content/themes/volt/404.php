@@ -1,0 +1,1 @@
+<?php get_header(); ?><main id="main" class="wrap page-main"><h1>Страница не найдена</h1><p>Перейдите в каталог и найдите нужную технику.</p><a class="button" href="<?php echo esc_url(home_url('/catalog/')); ?>">Открыть каталог</a></main><?php get_footer(); ?>

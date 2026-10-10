@@ -1,0 +1,1 @@
+<?php get_header(); ?><main id="main" class="wrap page-main"><?php while(have_posts()):the_post(); ?><h1><?php the_title(); ?></h1><div class="<?php echo function_exists('is_cart') && (is_cart() || is_checkout()) ? '' : 'content'; ?>"><?php the_content(); ?></div><?php endwhile; ?></main><?php get_footer(); ?>
