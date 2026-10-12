@@ -26,7 +26,7 @@ $cart=volt_page('cart','Корзина','[woocommerce_cart]');
 $checkout=volt_page('checkout','Оформление учебного заказа','<p>Это демонстрационный магазин. Реальные покупки и платежи недоступны.</p>[woocommerce_checkout]');
 $account=volt_page('my-account','Личный кабинет','[woocommerce_my_account]');
 $terms=volt_page('terms','Условия использования','<h2>Учебный проект</h2><p>VOLT создан для экзамена по сопровождению программного обеспечения. Товары, цены и предложения демонстрационные. Сайт не является публичной офертой, не принимает оплату и не осуществляет доставку.</p><h2>Использование сайта</h2><p>Можно просматривать каталог, добавлять товары в корзину и отправлять тестовые сообщения. Не указывайте настоящие платёжные реквизиты или чувствительные сведения.</p><h2>Социальные сети</h2><p>Ссылки в подвале ведут на главные страницы социальных платформ. Собственные аккаунты магазина не созданы.</p>');
-$privacy=volt_page('privacy','Политика обработки данных','<p>При отправке формы имя, электронная почта и сообщение сохраняются в локальной базе учебного проекта и доступны администратору. Не отправляйте реальные персональные данные в демонстрационную форму.</p><p>Корзина WooCommerce использует необходимые файлы cookie для сохранения выбранных товаров.</p><p>Плагин Google Analytics установлен, но сбор статистики не включён до настройки настоящего идентификатора GA4 и необходимых настроек согласия. При публикации сайта эту политику нужно дополнить данными владельца, сроками хранения и порядком удаления данных.</p>');
+$privacy=volt_page('privacy','Политика обработки данных','<p>При отправке формы имя, электронная почта и сообщение сохраняются в локальной базе учебного проекта и доступны администратору. Не отправляйте реальные персональные данные в демонстрационную форму.</p><p>Корзина WooCommerce использует необходимые файлы cookie для сохранения выбранных товаров.</p><p>Google Analytics 4 подключена через плагин GA Google Analytics к отдельному ресурсу VOLT. Аналитика учитывает просмотры страниц и взаимодействия с сайтом с помощью аналитических cookies. Рекламные сигналы отключены, посещения администратора не учитываются. Имена, электронная почта и тексты обращений не передаются в аналитику. При публикации сайта эту политику нужно дополнить данными владельца, сроками хранения и порядком удаления данных.</p>');
 foreach(['show_on_front'=>'page','page_on_front'=>$home,'page_for_posts'=>$news,'posts_per_page'=>3,'woocommerce_shop_page_id'=>$shop,'woocommerce_cart_page_id'=>$cart,'woocommerce_checkout_page_id'=>$checkout,'woocommerce_myaccount_page_id'=>$account,'woocommerce_terms_page_id'=>$terms,'wp_page_for_privacy_policy'=>$privacy,'volt_contact_page'=>$contact,'woocommerce_currency'=>'RUB','woocommerce_default_country'=>'RU','woocommerce_price_num_decimals'=>0,'woocommerce_price_thousand_sep'=>' ','woocommerce_price_decimal_sep'=>',','woocommerce_currency_pos'=>'right_space','blogdescription'=>'Электроника для ваших идей','woocommerce_allow_tracking'=>'no'] as $key=>$value) update_option($key,$value);
 $menu=wp_get_nav_menu_object('Главное меню');
 $menu_id=$menu ? $menu->term_id : wp_create_nav_menu('Главное меню');
@@ -57,4 +57,22 @@ $stories=[
 foreach($stories as $i=>$s){if(get_page_by_path($s[0],OBJECT,'post'))continue;$id=wp_insert_post(['post_type'=>'post','post_status'=>'publish','post_name'=>$s[0],'post_title'=>$s[1],'post_content'=>'<p>'.esc_html($s[2]).'</p>','post_excerpt'=>wp_trim_words($s[2],22),'post_date'=>wp_date('Y-m-d H:i:s',time()-$i*DAY_IN_SECONDS)],true);if(is_wp_error($id))throw new RuntimeException($id->get_error_message());}
 update_option('permalink_structure','/%postname%/');
 flush_rewrite_rules();
+// Restore the configured GA4 stream during installation.
+$ga_path=__DIR__.'/analytics.json';
+if(is_readable($ga_path)) {
+    $ga=json_decode(file_get_contents($ga_path),true);
+    $ga_id=$ga['measurement_id'] ?? '';
+    if(preg_match('/^G-[A-Z0-9]+$/',$ga_id) && class_exists('GA_Google_Analytics')) {
+        global $GA_Google_Analytics;
+        $options=get_option('gap_options',$GA_Google_Analytics->default_options());
+        $options['gap_id']=$ga_id;
+        $options['gap_enable']=2;
+        $options['gap_location']='header';
+        $options['disable_admin']=1;
+        $options['admin_area']=0;
+        $options['tracker_object']='{"allow_google_signals":false,"allow_ad_personalization_signals":false}';
+        update_option('gap_options',$options);
+    }
+}
+
 echo "Created pages, 8 products, 7 news posts and navigation.\n";
